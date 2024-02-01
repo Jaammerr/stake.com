@@ -1,0 +1,51 @@
+
+services:
+  api:
+    build: ./project/api
+    container_name: API
+    ports:
+      - 8004:8000
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  worker:
+    build: ./project/api
+    container_name: Celery
+    command: celery -A worker.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - api
+      - redis
+
+  web:
+    build: ./project/gui
+    container_name: Web
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    depends_on:
+      - api
+
+#  scraper:
+#    build: ./project/scraper
+#    container_name: Scraper
+#    # command: python main.py
+#    volumes:
+#      - .:/app
+#    depends_on:
+#      - api
+
+  redis:
+    container_name: Redis
+    image: redis:7
