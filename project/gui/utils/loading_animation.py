@@ -7,7 +7,6 @@ class LoadingAnimation:
         page.splash = ft.ProgressBar(color=ft.colors.GREEN_300)
         page.update()
 
-
     @classmethod
     def stop(cls, page: ft.Page):
         page.splash = None

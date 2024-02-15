@@ -16,14 +16,14 @@ async def process_bet(data: ProcessBetData):
     task = process_bet_data.delay(data.model_dump())
     return JSONResponse(
         {
-            'status': 'ok',
+            "status": "ok",
             "message": "Success",
             "result": {
                 "task_id": task.id,
                 "task_status": task.status,
                 "task_result": task.result,
                 "bet_url": data.url,
-            }
+            },
         }
     )
 
@@ -31,10 +31,4 @@ async def process_bet(data: ProcessBetData):
 @router.get("/channels", status_code=200)
 async def get_channels():
     channels = TelegramChannel.get_all_channels()
-    return JSONResponse(
-        {
-            'status': 'ok',
-            "message": "Success",
-            "result": channels
-        }
-    )
+    return JSONResponse({"status": "ok", "message": "Success", "result": channels})

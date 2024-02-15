@@ -16,9 +16,9 @@ class TelegramChannel(Model):
 
     @classmethod
     def add_new_channel(
-            cls,
-            channel_id: int,
-            channel_title: str,
+        cls,
+        channel_id: int,
+        channel_title: str,
     ) -> bool:
         try:
             if cls.is_exists(channel_id):
@@ -40,7 +40,6 @@ class TelegramChannel(Model):
     def is_exists(cls, channel_id: int) -> bool:
         return cls.select().where(cls.channel_id == channel_id).exists()
 
-
     @classmethod
     def get_all_channels(cls) -> list[dict]:
         channels = [channel for channel in cls.select()]
@@ -48,11 +47,10 @@ class TelegramChannel(Model):
             {
                 "channel_id": channel.channel_id,
                 "channel_title": channel.channel_title,
-                "channel_created_at": str(channel.channel_created_at)
+                "channel_created_at": str(channel.channel_created_at),
             }
             for channel in channels
         ]
-
 
     @classmethod
     def delete_channel(cls, channel_id: int) -> bool:

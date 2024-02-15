@@ -1,3 +1,4 @@
 pyuseragents
 curl_cffi
 loguru
+PyYAML

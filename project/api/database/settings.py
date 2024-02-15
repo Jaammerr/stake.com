@@ -8,4 +8,3 @@ db = PostgresqlDatabase(
     host="aws-0-us-west-1.pooler.supabase.com",
     port=6543,
 )
-

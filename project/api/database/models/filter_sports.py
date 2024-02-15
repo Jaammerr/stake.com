@@ -9,7 +9,9 @@ from loguru import logger
 
 
 class FilterSports(Model):
-    channel = ForeignKeyField(TelegramChannel, backref='filters', column_name='channel_id')
+    channel = ForeignKeyField(
+        TelegramChannel, backref="filters", column_name="channel_id"
+    )
     uuid = UUIDField()
     sport = TextField()
     min_multiplier = FloatField(null=True, default=0)
@@ -19,9 +21,7 @@ class FilterSports(Model):
 
     class Meta:
         database = db
-        primary_key = CompositeKey('channel', 'uuid')
-
-
+        primary_key = CompositeKey("channel", "uuid")
 
     @classmethod
     def get_sports_filters(cls, channel_id: int) -> list[dict]:
@@ -30,17 +30,20 @@ class FilterSports(Model):
         channel_data = []
         for filter in filters:
 
-            channel_data.append({
-                "sport": filter.sport,
-                "filter_uuid": str(filter.uuid) if filter.uuid else str(uuid.uuid4()),
-                "min_multiplier": filter.min_multiplier,
-                "max_multiplier": filter.max_multiplier,
-                "min_amount": filter.min_amount,
-                "max_amount": filter.max_amount,
-            })
+            channel_data.append(
+                {
+                    "sport": filter.sport,
+                    "filter_uuid": (
+                        str(filter.uuid) if filter.uuid else str(uuid.uuid4())
+                    ),
+                    "min_multiplier": filter.min_multiplier,
+                    "max_multiplier": filter.max_multiplier,
+                    "min_amount": filter.min_amount,
+                    "max_amount": filter.max_amount,
+                }
+            )
 
         return channel_data
-
 
     @classmethod
     def get_all_sports_filters(cls) -> list[dict]:
@@ -49,18 +52,21 @@ class FilterSports(Model):
         channel_data = []
         for filter in filters:
 
-            channel_data.append({
-                "channel_id": filter.channel_id,
-                "sport": filter.sport,
-                "filter_uuid": str(filter.uuid) if filter.uuid else str(uuid.uuid4()),
-                "min_multiplier": filter.min_multiplier,
-                "max_multiplier": filter.max_multiplier,
-                "min_amount": filter.min_amount,
-                "max_amount": filter.max_amount,
-            })
+            channel_data.append(
+                {
+                    "channel_id": filter.channel_id,
+                    "sport": filter.sport,
+                    "filter_uuid": (
+                        str(filter.uuid) if filter.uuid else str(uuid.uuid4())
+                    ),
+                    "min_multiplier": filter.min_multiplier,
+                    "max_multiplier": filter.max_multiplier,
+                    "min_amount": filter.min_amount,
+                    "max_amount": filter.max_amount,
+                }
+            )
 
         return channel_data
-
 
     @classmethod
     def delete_sports_filters(cls, channel_id: int) -> bool:
@@ -68,9 +74,10 @@ class FilterSports(Model):
             cls.delete().where(cls.channel_id == channel_id).execute()
             return True
         except Exception as error:
-            logger.error(f"Error while deleting channel sports filters with ID {channel_id}: {error}")
+            logger.error(
+                f"Error while deleting channel sports filters with ID {channel_id}: {error}"
+            )
             return False
-
 
     @classmethod
     def update_sports_filter(cls, data: UpdateSportsFilterData):
@@ -108,7 +115,6 @@ class FilterSports(Model):
                 min_amount=filter.min_amount if filter.min_amount else 0,
                 max_amount=filter.max_amount if filter.max_amount else 0,
             )
-
 
         # delete another sports filters if they are not in data.sports_data
         # cls.delete().where(

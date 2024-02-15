@@ -1,5 +1,3 @@
-
-
 def is_float(data: str) -> bool:
     try:
         float(data)

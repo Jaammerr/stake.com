@@ -1,10 +1,8 @@
-from pyrogram.enums import ChatMemberStatus
 from pyrogram.errors import PeerIdInvalid
 
 from bot import bot
 from models import CheckChannelData
 from database import TelegramChannel
-
 
 
 async def process_verify_channel(data: CheckChannelData) -> dict:
@@ -19,13 +17,12 @@ async def process_verify_channel(data: CheckChannelData) -> dict:
         # if member_info.status == ChatMemberStatus.ADMINISTRATOR:
         channel_data = await bot.get_chat(data.channel_id)
         if not TelegramChannel.add_new_channel(
-            channel_id=data.channel_id,
-            channel_title=channel_data.title
+            channel_id=data.channel_id, channel_title=channel_data.title
         ):
             return {
                 "status": "error",
                 "message": "Error: Channel already exists",
-                "result": None
+                "result": None,
             }
 
         return {
@@ -34,7 +31,7 @@ async def process_verify_channel(data: CheckChannelData) -> dict:
             "result": {
                 "channel_id": data.channel_id,
                 "channel_title": channel_data.title,
-            }
+            },
         }
 
         # return {
@@ -43,18 +40,13 @@ async def process_verify_channel(data: CheckChannelData) -> dict:
         #     "result": None
         # }
 
-
     except PeerIdInvalid as error:
         print(f"PerrIdInvalid: {error}")
         return {
             "status": "error",
             "message": "Error: Invalid channel ID",
-            "result": None
+            "result": None,
         }
 
     except Exception as error:
-        return {
-            "status": "error",
-            "message": f"Error: {error}",
-            "result": None
-        }
+        return {"status": "error", "message": f"Error: {error}", "result": None}

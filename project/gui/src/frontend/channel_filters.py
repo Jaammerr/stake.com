@@ -27,8 +27,9 @@ class ChannelFilters(ft.UserControl):
             visible=False,
         )
 
-
-    def get_sports_filters_container(self, sports: list[str], search_bar: ft.SearchBar, container: ft.Container) -> None:
+    def get_sports_filters_container(
+        self, sports: list[str], search_bar: ft.SearchBar, container: ft.Container
+    ) -> None:
         new_sports_filters = []
 
         def get_old_sport_data(_sport: str) -> dict:
@@ -37,7 +38,6 @@ class ChannelFilters(ft.UserControl):
                     return sport_data
 
             return {}
-
 
         def on_change(event: ControlEvent):
             changed_sport = event.control.hint_text
@@ -53,18 +53,21 @@ class ChannelFilters(ft.UserControl):
             event.control.border_color = ft.colors.GREEN_900
             event.control.update()
 
-            if changed_sport in [sport_data.get("sport") for sport_data in self.sports_filters]:
+            if changed_sport in [
+                sport_data.get("sport") for sport_data in self.sports_filters
+            ]:
                 for sport_data in self.sports_filters:
                     if sport_data.get("sport") == changed_sport:
                         sport_data[changed_value_name] = changed_value
                         return
 
             else:
-                if changed_sport not in [sport_data.get("sport") for sport_data in new_sports_filters]:
-                    new_sports_filters.append({
-                        "sport": changed_sport,
-                        changed_value_name: changed_value
-                    })
+                if changed_sport not in [
+                    sport_data.get("sport") for sport_data in new_sports_filters
+                ]:
+                    new_sports_filters.append(
+                        {"sport": changed_sport, changed_value_name: changed_value}
+                    )
                 else:
                     for sport_data in new_sports_filters:
                         if sport_data.get("sport") == changed_sport:
@@ -73,7 +76,6 @@ class ChannelFilters(ft.UserControl):
 
             container.border = ft.border.all(color=ft.colors.GREEN_900, width=2)
             container.update()
-
 
         def on_submit_values(event: ControlEvent):
             self.page.views.pop()
@@ -84,13 +86,19 @@ class ChannelFilters(ft.UserControl):
             for sport_data in new_sports_filters:
                 old_data = get_old_sport_data(sport_data.get("sport"))
                 if old_data:
-                    if old_data.get("filter_uuid") and not sport_data.get("filter_uuid"):
+                    if old_data.get("filter_uuid") and not sport_data.get(
+                        "filter_uuid"
+                    ):
                         sport_data["filter_uuid"] = old_data.get("filter_uuid")
 
-                    if old_data.get("min_multiplier") and not sport_data.get("min_multiplier"):
+                    if old_data.get("min_multiplier") and not sport_data.get(
+                        "min_multiplier"
+                    ):
                         sport_data["min_multiplier"] = old_data.get("min_multiplier")
 
-                    if old_data.get("max_multiplier") and not sport_data.get("max_multiplier"):
+                    if old_data.get("max_multiplier") and not sport_data.get(
+                        "max_multiplier"
+                    ):
                         sport_data["max_multiplier"] = old_data.get("max_multiplier")
 
                     if old_data.get("min_amount") and not sport_data.get("min_amount"):
@@ -99,17 +107,20 @@ class ChannelFilters(ft.UserControl):
                     if old_data.get("max_amount") and not sport_data.get("max_amount"):
                         sport_data["max_amount"] = old_data.get("max_amount")
 
-
             if new_sports_filters:
                 for _sport in sports:
-                    if _sport not in [sport_data.get("sport") for sport_data in new_sports_filters]:
+                    if _sport not in [
+                        sport_data.get("sport") for sport_data in new_sports_filters
+                    ]:
                         new_sports_filters.append(get_old_sport_data(_sport))
 
                 self.sports_filters = new_sports_filters
 
             else:
                 for _sport in sports:
-                    if _sport not in [sport_data.get("sport") for sport_data in self.sports_filters]:
+                    if _sport not in [
+                        sport_data.get("sport") for sport_data in self.sports_filters
+                    ]:
                         self.sports_filters.append({"sport": _sport})
 
                 # delete all sports from self.sports_filters except those that are in sports
@@ -117,16 +128,14 @@ class ChannelFilters(ft.UserControl):
                     if sport_data.get("sport") not in sports:
                         self.sports_filters.remove(sport_data)
 
-
             for sport_data in self.sports_filters:
                 if not sport_data:
                     self.sports_filters.remove(sport_data)
 
-
             # clear duplicates in self.sports_filters
-            self.sports_filters = list({v['sport']: v for v in self.sports_filters}.values())
-
-
+            self.sports_filters = list(
+                {v["sport"]: v for v in self.sports_filters}.values()
+            )
 
         sports_filters = ft.Column(scroll=ft.ScrollMode.ALWAYS, spacing=30)
         for sport in sports:
@@ -135,24 +144,80 @@ class ChannelFilters(ft.UserControl):
             sport_container = ft.Container(
                 ft.Column(
                     [
-                        ft.Container(ft.Text(sport, size=25, weight=ft.FontWeight.W_500, font_family="Exo1"), alignment=ft.alignment.top_left),
-                        ft.Row(
-                            [
-                                ft.TextField(label="Min multiplier", hint_text=sport, border_radius=15, border_color=ft.colors.GREY_700, border_width=2, value=old_sport_data.get("min_multiplier") if old_sport_data.get("min_multiplier") else "0", on_change=on_change),
-                                ft.TextField(label="Max multiplier", hint_text=sport, border_radius=15, border_color=ft.colors.GREY_700, border_width=2, value=old_sport_data.get("max_multiplier") if old_sport_data.get("max_multiplier") else "0", on_change=on_change),
-                            ],
-                            spacing=30
+                        ft.Container(
+                            ft.Text(
+                                sport,
+                                size=25,
+                                weight=ft.FontWeight.W_500,
+                                font_family="Exo1",
+                            ),
+                            alignment=ft.alignment.top_left,
                         ),
                         ft.Row(
                             [
-                                ft.TextField(label="Min amount", hint_text=sport, border_radius=15, border_color=ft.colors.GREY_700, border_width=2, value=old_sport_data.get("min_amount") if old_sport_data.get("min_amount") else "0", on_change=on_change),
-                                ft.TextField(label="Max amount", hint_text=sport, border_radius=15, border_color=ft.colors.GREY_700, border_width=2, value=old_sport_data.get("max_amount") if old_sport_data.get("max_amount") else "0", on_change=on_change),
+                                ft.TextField(
+                                    label="Min multiplier",
+                                    hint_text=sport,
+                                    border_radius=15,
+                                    border_color=ft.colors.GREY_700,
+                                    border_width=2,
+                                    value=(
+                                        old_sport_data.get("min_multiplier")
+                                        if old_sport_data.get("min_multiplier")
+                                        else "0"
+                                    ),
+                                    on_change=on_change,
+                                ),
+                                ft.TextField(
+                                    label="Max multiplier",
+                                    hint_text=sport,
+                                    border_radius=15,
+                                    border_color=ft.colors.GREY_700,
+                                    border_width=2,
+                                    value=(
+                                        old_sport_data.get("max_multiplier")
+                                        if old_sport_data.get("max_multiplier")
+                                        else "0"
+                                    ),
+                                    on_change=on_change,
+                                ),
                             ],
-                            spacing=30
-                        )
+                            spacing=30,
+                        ),
+                        ft.Row(
+                            [
+                                ft.TextField(
+                                    label="Min amount",
+                                    hint_text=sport,
+                                    border_radius=15,
+                                    border_color=ft.colors.GREY_700,
+                                    border_width=2,
+                                    value=(
+                                        old_sport_data.get("min_amount")
+                                        if old_sport_data.get("min_amount")
+                                        else "0"
+                                    ),
+                                    on_change=on_change,
+                                ),
+                                ft.TextField(
+                                    label="Max amount",
+                                    hint_text=sport,
+                                    border_radius=15,
+                                    border_color=ft.colors.GREY_700,
+                                    border_width=2,
+                                    value=(
+                                        old_sport_data.get("max_amount")
+                                        if old_sport_data.get("max_amount")
+                                        else "0"
+                                    ),
+                                    on_change=on_change,
+                                ),
+                            ],
+                            spacing=30,
+                        ),
                     ],
                     scroll=ft.ScrollMode.ALWAYS,
-                    spacing=30
+                    spacing=30,
                 ),
                 bgcolor=ft.colors.GREY_900,
                 padding=ft.padding.all(20),
@@ -161,26 +226,36 @@ class ChannelFilters(ft.UserControl):
 
             sports_filters.controls.append(sport_container)
 
-        self.page.views.append(ft.View(
-            route="/full",
-            appbar=ft.AppBar(title=ft.Text("Sports Filters")),
-            floating_action_button=ft.FloatingActionButton(width=70, height=70, on_click=on_submit_values, bgcolor=ft.colors.BLACK, content=ft.Container(border=ft.border.all(color=ft.colors.GREEN_700, width=2), padding=ft.padding.all(10), border_radius=10, content=ft.Icon(ft.icons.ARROW_UPWARD_SHARP))),
-            floating_action_button_location=ft.FloatingActionButtonLocation.MINI_CENTER_TOP,
-            controls=[
-                ft.Container(
-                    ft.Column(
-                        [
-                            sports_filters
-                        ],
+        self.page.views.append(
+            ft.View(
+                route="/full",
+                appbar=ft.AppBar(title=ft.Text("Sports Filters")),
+                floating_action_button=ft.FloatingActionButton(
+                    width=70,
+                    height=70,
+                    on_click=on_submit_values,
+                    bgcolor=ft.colors.BLACK,
+                    content=ft.Container(
+                        border=ft.border.all(color=ft.colors.GREEN_700, width=2),
+                        padding=ft.padding.all(10),
+                        border_radius=10,
+                        content=ft.Icon(ft.icons.ARROW_UPWARD_SHARP),
                     ),
-                    padding=ft.padding.only(top=40, left=20, right=20, bottom=40),
-                )
-            ],
-            bgcolor=ft.colors.BLACK,
-            fullscreen_dialog=True,
-            scroll=ft.ScrollMode.ALWAYS,
-        ))
-
+                ),
+                floating_action_button_location=ft.FloatingActionButtonLocation.MINI_CENTER_TOP,
+                controls=[
+                    ft.Container(
+                        ft.Column(
+                            [sports_filters],
+                        ),
+                        padding=ft.padding.only(top=40, left=20, right=20, bottom=40),
+                    )
+                ],
+                bgcolor=ft.colors.BLACK,
+                fullscreen_dialog=True,
+                scroll=ft.ScrollMode.ALWAYS,
+            )
+        )
 
     def get_filters(self) -> None:
         # response = requests.post('http://api:8000/channel/get_filters', json={
@@ -188,14 +263,14 @@ class ChannelFilters(ft.UserControl):
         # })
         json_data = api.get_channel_filters(self.channel_id)
 
-        if json_data['status'] == 'ok':
-            filters = json_data['result']['filters']
+        if json_data["status"] == "ok":
+            filters = json_data["result"]["filters"]
             if not filters:
                 self.filters = {}
             else:
                 self.filters = filters
 
-            sports_filters = json_data['result']['sports_filters']
+            sports_filters = json_data["result"]["sports_filters"]
             if not sports_filters:
                 self.sports_filters = []
             else:
@@ -215,7 +290,7 @@ class ChannelFilters(ft.UserControl):
 
                 else:
                     if old_sports.startswith(f"{sport}, "):
-                        search_bar.value = old_sports[len(f"{sport}, "):]
+                        search_bar.value = old_sports[len(f"{sport}, ") :]
                     else:
                         search_bar.value = old_sports.replace(f", {sport}", "")
 
@@ -245,45 +320,84 @@ class ChannelFilters(ft.UserControl):
             self.page.go("/full")
             self.page.update()
 
-
-        values = ["All", "Soccer", "Tennis", "Basketball", "American Football", "Ice Hockey", "Table Tennis", "Cricket", "CS2", "League of Legends", "Dota 2", "Alpine Skiing", "Aussie Rules", "Badminton", "Bandy", "Baseball", "Biathlon", "Bowls", "Boxing", "Cross-Country", "Cycling", "Darts", "Field Hockey", "Floorball", "Formula 1", "Futsal", "Gaelic Football", "Golf", "Handball", "Kabaddi", "Lacrosse", "MMA", "Motorsport", "Olympics", "Rugby", "Snooker", "Stock Car Racing", "Volleyball",
-                  "Waterpolo"]
+        values = [
+            "All",
+            "Soccer",
+            "Tennis",
+            "Basketball",
+            "American Football",
+            "Ice Hockey",
+            "Table Tennis",
+            "Cricket",
+            "CS2",
+            "League of Legends",
+            "Dota 2",
+            "Alpine Skiing",
+            "Aussie Rules",
+            "Badminton",
+            "Bandy",
+            "Baseball",
+            "Biathlon",
+            "Bowls",
+            "Boxing",
+            "Cross-Country",
+            "Cycling",
+            "Darts",
+            "Field Hockey",
+            "Floorball",
+            "Formula 1",
+            "Futsal",
+            "Gaelic Football",
+            "Golf",
+            "Handball",
+            "Kabaddi",
+            "Lacrosse",
+            "MMA",
+            "Motorsport",
+            "Olympics",
+            "Rugby",
+            "Snooker",
+            "Stock Car Racing",
+            "Volleyball",
+            "Waterpolo",
+        ]
         values = sorted(values)
 
-
         submit_button = ft.ElevatedButton(
-            content=ft.Text("Submit", size=20, weight=ft.FontWeight.W_500, font_family="Exo1"),
+            content=ft.Text(
+                "Submit", size=20, weight=ft.FontWeight.W_500, font_family="Exo1"
+            ),
             color=ft.colors.WHITE,
             style=ft.ButtonStyle(
                 shape=ft.ContinuousRectangleBorder(radius=15),
             ),
             width=6000,
             height=55,
-            on_click=process_submit
+            on_click=process_submit,
         )
         sports_controls = ft.Column([submit_button])
         for sport in values:
-            sports_controls.controls.append(ft.ListTile(title=ft.Text(sport), data=sport, on_click=handle_click))
-
+            sports_controls.controls.append(
+                ft.ListTile(title=ft.Text(sport), data=sport, on_click=handle_click)
+            )
 
         search_bar = ft.SearchBar(
             view_elevation=4,
             divider_color=ft.colors.GREY_900,
             bar_hint_text="Select sports..." if not self.sports_filters else None,
-            value=", ".join([
-                sport.get("sport") for sport in self.sports_filters
-            ]) if self.sports_filters else "All",
+            value=(
+                ", ".join([sport.get("sport") for sport in self.sports_filters])
+                if self.sports_filters
+                else "All"
+            ),
             view_hint_text="Choose a sport from the suggestions...",
-            controls=[
-                sports_controls
-            ],
+            controls=[sports_controls],
             bar_bgcolor=ft.colors.BLACK87,
         )
 
-
         container = ft.Container(
             search_bar,
-            border=ft.border.all(color=ft.colors.GREY_700, width=2),
+            # border=ft.border.all(color=ft.colors.GREY_700, width=2),
             border_radius=20,
             bgcolor=ft.colors.BLACK38,
         )
@@ -291,22 +405,35 @@ class ChannelFilters(ft.UserControl):
         anchor = ft.Container(
             ft.Column(
                 [
-                    ft.Container(ft.Text("Sports", size=25, weight=ft.FontWeight.W_500, font_family="Exo1"), alignment=ft.alignment.top_left),
-                    ft.Container(container, width=6000, bgcolor=ft.colors.BLACK26, padding=ft.padding.all(20), border_radius=6)
+                    ft.Container(
+                        ft.Text(
+                            "Sports",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        container,
+                        width=6000,
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
                 ],
-                spacing=10
+                spacing=10,
             )
         )
 
         self.row.controls.append(anchor)
-
 
     def update_users_filter(self):
 
         def on_change_users(event: ControlEvent):
             users = input_field.value
             if users:
-                users = users.split(", ")
+                users = users.split("; ")
                 users = [user for user in users if user]
 
                 input_field.error_text = ""
@@ -318,32 +445,331 @@ class ChannelFilters(ft.UserControl):
 
             input_field.update()
 
-
-        input_field = ft.TextField(label="Users", hint_text="Enter users..", border_radius=15, border_color=ft.colors.GREY_700, border_width=2, on_change=on_change_users)
+        input_field = ft.TextField(
+            label="Users",
+            hint_text="Enter users..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+            on_change=on_change_users,
+            helper_text="Example: user1; user2; user3",
+        )
 
         if self.filters.get("users"):
             if self.filters.get("users").get("values"):
-                input_field.value = ", ".join(self.filters.get("users").get("values"))
+                input_field.value = "; ".join(self.filters.get("users").get("values"))
             else:
                 input_field.value = "All"
-
 
         anchor = ft.Container(
             ft.Column(
                 [
-                    ft.Container(ft.Text("Users", size=25, weight=ft.FontWeight.W_500, font_family="Exo1"), alignment=ft.alignment.top_left),
-                    ft.Container(input_field, bgcolor=ft.colors.BLACK26, padding=ft.padding.all(20), border_radius=6)
+                    ft.Container(
+                        ft.Text(
+                            "Users",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        input_field,
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
                 ],
-                spacing=10
+                spacing=10,
             )
         )
         self.row.controls.append(anchor)
 
+    def update_commands_filter(self):
 
+        def on_change_valid_commands(event: ControlEvent):
+            commands = input_field_valid.value
+            if commands:
+                commands = commands.split("; ")
+                commands = [command for command in commands if command]
+
+                input_field_valid.error_text = ""
+                input_field_valid.border_color = ft.colors.GREEN_900
+
+                self.filters["valid_commands"]["values"] = commands
+            else:
+                input_field_valid.error_text = "Commands field can't be empty"
+
+            input_field_valid.update()
+
+        def on_change_invalid_commands(event: ControlEvent):
+            commands = input_field_invalid.value
+            if commands:
+                commands = commands.split("; ")
+                commands = [command for command in commands if command]
+
+                input_field_invalid.error_text = ""
+                input_field_invalid.border_color = ft.colors.GREEN_900
+
+                self.filters["invalid_commands"]["values"] = commands
+            else:
+                input_field_invalid.error_text = "Commands field can't be empty"
+
+            input_field_invalid.update()
+
+        def on_submit_include_commands(event: ControlEvent):
+            self.filters["include_commands"] = include_commands_checkbox.value
+
+            include_commands_checkbox.border_color = ft.colors.GREEN_900
+            include_commands_checkbox.update()
+
+        input_field_valid = ft.TextField(
+            label="Including commands",
+            hint_text="Enter including commands..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+            on_change=on_change_valid_commands,
+            helper_text="Example: command1; command2; command3"
+        )
+
+        input_field_invalid = ft.TextField(
+            label="Excluding commands",
+            hint_text="Enter excluding commands..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+            on_change=on_change_invalid_commands,
+            helper_text="Example: command1; command2; command3"
+        )
+
+        include_commands_checkbox = ft.Checkbox(
+            label="Include all",
+            on_change=on_submit_include_commands,
+            value=True if self.filters.get("include_commands") else False,
+        )
+
+        if self.filters.get("valid_commands"):
+            if self.filters.get("valid_commands").get("values"):
+                input_field_valid.value = "; ".join(
+                    self.filters.get("valid_commands").get("values")
+                )
+            else:
+                input_field_valid.value = "All"
+
+        if self.filters.get("invalid_commands"):
+            if self.filters.get("invalid_commands").get("values"):
+                input_field_invalid.value = "; ".join(
+                    self.filters.get("invalid_commands").get("values")
+                )
+            else:
+                input_field_invalid.value = "All"
+
+        including_commands_anchor = ft.Container(
+            ft.Column(
+                [
+                    ft.Container(
+                        ft.Text(
+                            "Including Commands",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        ft.Column(
+                            [
+                                input_field_valid,
+                                include_commands_checkbox,
+                                # input_field_invalid
+                            ]
+                        ),
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
+                ],
+                spacing=10,
+            )
+        )
+
+        excluding_commands_anchor = ft.Container(
+            ft.Column(
+                [
+                    ft.Container(
+                        ft.Text(
+                            "Excluding Commands",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        input_field_invalid,
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
+                ],
+                spacing=10,
+            )
+        )
+
+        self.row.controls.append(including_commands_anchor)
+        self.row.controls.append(excluding_commands_anchor)
+
+    def update_leagues_filter(self):
+
+        def on_change_valid_leagues(event: ControlEvent):
+            leagues = input_field_valid.value
+            if leagues:
+                leagues = leagues.split("; ")
+                leagues = [league for league in leagues if league]
+
+                input_field_valid.error_text = ""
+                input_field_valid.border_color = ft.colors.GREEN_900
+
+                self.filters["valid_leagues"]["values"] = leagues
+            else:
+                input_field_valid.error_text = "Commands field can't be empty"
+
+            input_field_valid.update()
+
+        def on_change_invalid_leagues(event: ControlEvent):
+            leagues = input_field_invalid.value
+            if leagues:
+                leagues = leagues.split("; ")
+                leagues = [league for league in leagues if league]
+
+                input_field_invalid.error_text = ""
+                input_field_invalid.border_color = ft.colors.GREEN_900
+
+                self.filters["invalid_leagues"]["values"] = leagues
+            else:
+                input_field_invalid.error_text = "Commands field can't be empty"
+
+            input_field_invalid.update()
+
+        def on_submit_include_leagues(event: ControlEvent):
+            self.filters["include_leagues"] = include_leagues_checkbox.value
+
+            include_leagues_checkbox.border_color = ft.colors.GREEN_900
+            include_leagues_checkbox.update()
+
+        input_field_valid = ft.TextField(
+            label="Including leagues",
+            hint_text="Enter including commands..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+            on_change=on_change_valid_leagues,
+            helper_text="Example: league1; league2; league3"
+        )
+
+        input_field_invalid = ft.TextField(
+            label="Excluding leagues",
+            hint_text="Enter excluding commands..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+            on_change=on_change_invalid_leagues,
+            helper_text="Example: league1; league2; league3"
+        )
+
+        include_leagues_checkbox = ft.Checkbox(
+            label="Include all",
+            on_change=on_submit_include_leagues,
+            value=True if self.filters.get("include_leagues") else False,
+        )
+
+        if self.filters.get("valid_leagues"):
+            if self.filters.get("valid_leagues").get("values"):
+                input_field_valid.value = "; ".join(
+                    self.filters.get("valid_leagues").get("values")
+                )
+            else:
+                input_field_valid.value = "All"
+
+        if self.filters.get("invalid_leagues"):
+            if self.filters.get("invalid_leagues").get("values"):
+                input_field_invalid.value = "; ".join(
+                    self.filters.get("invalid_leagues").get("values")
+                )
+            else:
+                input_field_invalid.value = "All"
+
+        including_leagues_anchor = ft.Container(
+            ft.Column(
+                [
+                    ft.Container(
+                        ft.Text(
+                            "Including Leagues",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        ft.Column(
+                            [
+                                input_field_valid,
+                                include_leagues_checkbox,
+                                # input_field_invalid
+                            ]
+                        ),
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
+                ],
+                spacing=10,
+            )
+        )
+
+        excluding_leagues_anchor = ft.Container(
+            ft.Column(
+                [
+                    ft.Container(
+                        ft.Text(
+                            "Excluding Leagues",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        input_field_invalid,
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
+                ],
+                spacing=10,
+            )
+        )
+
+        self.row.controls.append(including_leagues_anchor)
+        self.row.controls.append(excluding_leagues_anchor)
 
     def update_min_max_multiplier(self):
-        min_multiplier = ft.TextField(label="Min multiplier", hint_text="Enter min multiplier..", border_radius=15, border_color=ft.colors.GREY_700, border_width=2)
-        max_multiplier = ft.TextField(label="Max multiplier", hint_text="Enter max multiplier..", border_radius=15, border_color=ft.colors.GREY_700, border_width=2)
+        min_multiplier = ft.TextField(
+            label="Min multiplier",
+            hint_text="Enter min multiplier..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+        )
+        max_multiplier = ft.TextField(
+            label="Max multiplier",
+            hint_text="Enter max multiplier..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+        )
 
         if self.filters.get("min_multiplier"):
             min_multiplier.value = self.filters.get("min_multiplier")
@@ -354,23 +780,37 @@ class ChannelFilters(ft.UserControl):
         anchor = ft.Container(
             ft.Column(
                 [
-                    ft.Container(ft.Text("Total Multiplier", size=25, weight=ft.FontWeight.W_500, font_family="Exo1"), alignment=ft.alignment.top_left),
-                    ft.Row(
-                        [
-                            min_multiplier,
-                            max_multiplier
-                        ]
-                    )
+                    ft.Container(
+                        ft.Text(
+                            "Total Multiplier",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Row([min_multiplier, max_multiplier]),
                 ],
-                spacing=10
+                spacing=10,
             )
         )
         self.row.controls.append(anchor)
 
-
     def update_min_max_amount(self):
-        min_amount = ft.TextField(label="Min amount", hint_text="Enter min amount..", border_radius=15, border_color=ft.colors.GREY_700, border_width=2)
-        max_amount = ft.TextField(label="Max amount", hint_text="Enter max amount..", border_radius=15, border_color=ft.colors.GREY_700, border_width=2)
+        min_amount = ft.TextField(
+            label="Min amount",
+            hint_text="Enter min amount..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+        )
+        max_amount = ft.TextField(
+            label="Max amount",
+            hint_text="Enter max amount..",
+            border_radius=15,
+            border_color=ft.colors.GREY_700,
+            border_width=2,
+        )
 
         if self.filters.get("min_amount"):
             min_amount.value = self.filters.get("min_amount")
@@ -381,118 +821,209 @@ class ChannelFilters(ft.UserControl):
         anchor = ft.Container(
             ft.Column(
                 [
-                    ft.Container(ft.Text("Bet Amount", size=25, weight=ft.FontWeight.W_500, font_family="Exo1"), alignment=ft.alignment.top_left),
-                    ft.Row(
-                        [
-                            min_amount,
-                            max_amount
-                        ]
-                    )
+                    ft.Container(
+                        ft.Text(
+                            "Bet Amount",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Row([min_amount, max_amount]),
                 ]
             )
         )
         self.row.controls.append(anchor)
 
-
     def update_type_of_bet_and_count_of_outcomes(self):
 
-        def on_submit_count_of_outcomes(event: ControlEvent):
-            self.filters["count_of_outcomes"] = count_of_outcomes.value.replace("+", "")
-            count_of_outcomes.border_color = ft.colors.GREEN_900
-            count_of_outcomes.update()
+        # def on_submit_count_of_outcomes(event: ControlEvent):
+        #     self.filters["count_of_outcomes"] = count_of_outcomes.value.replace("+", "")
+        #     count_of_outcomes.border_color = ft.colors.GREEN_900
+        #     count_of_outcomes.update()
+        #
+        # def on_submit_include_sports(event: ControlEvent):
+        #     self.filters["include_sports"] = include_sports_checkbox.value
+        #
+        #     include_sports_container.border_color = ft.colors.GREEN_900
+        #     include_sports_container.update()
 
-        def on_submit_include_sports(event: ControlEvent):
-            self.filters["include_sports"] = include_sports_checkbox.value
+        # def on_submit_bet_type(event: ControlEvent):
+        #     if type_of_bet_field.value == "Multiple":
+        #         container.visible = True
+        #         include_sports_container.visible = True
+        #     else:
+        #         container.visible = False
+        #         include_sports_container.visible = False
+        #
+        #     self.filters["type_of_bet"] = type_of_bet_field.value
+        #
+        #     type_of_bet_field.border_color = ft.colors.GREEN_900
+        #     type_of_bet_field.update()
+        #     container.update()
+        #     include_sports_container.update()
 
-            include_sports_container.border_color = ft.colors.GREEN_900
-            include_sports_container.update()
+        # type_of_bet_field = ft.Dropdown(
+        #     value=(
+        #         self.filters.get("type_of_bet")
+        #         if self.filters.get("type_of_bet")
+        #         else "All"
+        #     ),
+        #     options=[
+        #         ft.dropdown.Option("All"),
+        #         ft.dropdown.Option("Single"),
+        #         ft.dropdown.Option("Multiple"),
+        #     ],
+        #     border_color=ft.colors.GREY_700,
+        #     border_radius=15,
+        #     border_width=2,
+        #     on_change=on_submit_bet_type,
+        # )
 
-        def on_submit_bet_type(event: ControlEvent):
-            if type_of_bet_field.value == "Multiple":
-                container.visible = True
-                include_sports_container.visible = True
+        def process_submit(event: ControlEvent):
+            types_of_bet = type_of_bet_search_bar.value
+
+            if not types_of_bet or types_of_bet == "All":
+                self.filters["types_of_bet"]["values"] = ["All"]
+                type_of_bet_search_bar.close_view(text="All")
+                # container.border = ft.border.all(color=ft.colors.GREEN_900, width=2)
+                # container.update()
+                return
+
+            list_types = types_of_bet.split(", ")
+            self.filters["types_of_bet"]["values"] = list_types
+            type_of_bet_search_bar.close_view(text=types_of_bet)
+
+            print(f"types_of_bet: {self.filters['types_of_bet']}")
+
+
+        submit_button = ft.ElevatedButton(
+            content=ft.Text(
+                "Submit", size=20, weight=ft.FontWeight.W_500, font_family="Exo1"
+            ),
+            color=ft.colors.WHITE,
+            style=ft.ButtonStyle(
+                shape=ft.ContinuousRectangleBorder(radius=15),
+            ),
+            width=6000,
+            height=55,
+            on_click=process_submit,
+        )
+
+        def handle_click(event: ControlEvent):
+            new_bet_type = event.control.data
+            old_bet_types = type_of_bet_search_bar.value
+
+            if "All" in new_bet_type:
+                type_of_bet_search_bar.value = "All"
+
             else:
-                container.visible = False
-                include_sports_container.visible = False
+                if new_bet_type not in old_bet_types:
+                    type_of_bet_search_bar.value = f"{old_bet_types}, {new_bet_type}" if old_bet_types else new_bet_type
+                else:
+                    if old_bet_types.startswith(f"{new_bet_type}, "):
+                        type_of_bet_search_bar.value = old_bet_types[len(f"{new_bet_type}, "):]
+                    else:
+                        type_of_bet_search_bar.value = old_bet_types.replace(f", {new_bet_type}", "")
 
-            self.filters["type_of_bet"] = type_of_bet_field.value
+                type_of_bet_search_bar.value = type_of_bet_search_bar.value.replace("All, ", "")
 
-            type_of_bet_field.border_color = ft.colors.GREEN_900
-            type_of_bet_field.update()
-            container.update()
-            include_sports_container.update()
+            type_of_bet_search_bar.update()
 
-        type_of_bet_field = ft.Dropdown(
-            value=self.filters.get("type_of_bet") if self.filters.get("type_of_bet") else "All",
-            options=[
-                ft.dropdown.Option("All"),
-                ft.dropdown.Option("Single"),
-                ft.dropdown.Option("Multiple"),
-            ],
-            border_color=ft.colors.GREY_700,
-            border_radius=15,
-            border_width=2,
-            on_change=on_submit_bet_type
+
+        types_controls = ft.Column([submit_button])
+        for name, value in [("All", "   "), ("Single", ""), ("Multiple | x2", "2"), ("Multiple | x3", "3"), ("Multiple | x4+", "4+")]:
+            types_controls.controls.append(
+                ft.ListTile(title=ft.Text(name), data=name, on_click=handle_click)
+            )
+
+        type_of_bet_search_bar = ft.SearchBar(
+            view_elevation=4,
+            divider_color=ft.colors.GREY_900,
+            bar_hint_text="Select types..." if not self.filters.get("types_of_bet") else None,
+            value=(
+                ", ".join([type_of_bet for type_of_bet in self.filters.get("types_of_bet").get("values")])
+                if self.filters.get("types_of_bet").get("values")
+                else "All"
+            ),
+            view_hint_text="Choose a sport from the suggestions...",
+            controls=[types_controls],
+            bar_bgcolor=ft.colors.BLACK87,
         )
 
-
-        outcomes_value = self.filters.get('count_of_outcomes')
-        if outcomes_value:
-            if int(outcomes_value) > 3:
-                outcomes_value = "4+"
-        else:
-            outcomes_value = str(outcomes_value)
-
-        count_of_outcomes = ft.Dropdown(
-            value=outcomes_value,
-            options=[
-                ft.dropdown.Option("2"),
-                ft.dropdown.Option("3"),
-                ft.dropdown.Option("4+"),
-            ],
-            border_color=ft.colors.GREY_700,
-            border_radius=15,
-            border_width=2,
-            on_change=on_submit_count_of_outcomes
-        )
-
-        container = ft.Container(
-            count_of_outcomes,
-            bgcolor=ft.colors.BLACK26,
-            padding=ft.padding.all(20),
-            border_radius=6,
-            visible=True if self.filters.get("type_of_bet") == "Multiple" else False
-        )
-
-        include_sports_checkbox = ft.Checkbox(
-            label="Include all sports",
-            on_change=on_submit_include_sports,
-            value=True if self.filters.get("include_sports") else False,
-            expand=True,
-            animate_size=50
-        )
-
-        include_sports_container = ft.Container(
-            include_sports_checkbox,
-            visible=True if self.filters.get("type_of_bet") == "Multiple" else False,
-            bgcolor=ft.colors.BLACK26,
-            padding=ft.padding.all(20),
-        )
+        # outcomes_value = self.filters.get("count_of_outcomes")
+        # if outcomes_value:
+        #     if int(outcomes_value) > 3:
+        #         outcomes_value = "4+"
+        # else:
+        #     outcomes_value = str(outcomes_value)
+        #
+        # count_of_outcomes = ft.Dropdown(
+        #     value=outcomes_value,
+        #     options=[
+        #         ft.dropdown.Option("2"),
+        #         ft.dropdown.Option("3"),
+        #         ft.dropdown.Option("4+"),
+        #     ],
+        #     border_color=ft.colors.GREY_700,
+        #     border_radius=15,
+        #     border_width=2,
+        #     on_change=on_submit_count_of_outcomes,
+        # )
+        #
+        # container = ft.Container(
+        #     count_of_outcomes,
+        #     bgcolor=ft.colors.BLACK26,
+        #     padding=ft.padding.all(20),
+        #     border_radius=6,
+        #     visible=True if self.filters.get("type_of_bet") == "Multiple" else False,
+        # )
+        #
+        # include_sports_checkbox = ft.Checkbox(
+        #     label="Include all sports",
+        #     on_change=on_submit_include_sports,
+        #     value=True if self.filters.get("include_sports") else False,
+        #     expand=True,
+        #     animate_size=50,
+        # )
+        #
+        # include_sports_container = ft.Container(
+        #     include_sports_checkbox,
+        #     visible=True if self.filters.get("type_of_bet") == "Multiple" else False,
+        #     bgcolor=ft.colors.BLACK26,
+        #     padding=ft.padding.all(20),
+        # )
 
         anchor = ft.Container(
             ft.Column(
                 [
-                    ft.Container(ft.Text("Type Of Bet", size=25, weight=ft.FontWeight.W_500, font_family="Exo1", ), alignment=ft.alignment.top_left),
+                    ft.Container(
+                        ft.Text(
+                            "Type Of Bet",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
                     ft.Column(
                         [
-                            ft.Container(type_of_bet_field, width=6000, bgcolor=ft.colors.BLACK26, padding=ft.padding.all(20), border_radius=6),
-                            container,
-                            include_sports_container
+                            ft.Container(
+                                # type_of_bet_field,
+                                type_of_bet_search_bar,
+                                width=6000,
+                                bgcolor=ft.colors.BLACK26,
+                                padding=ft.padding.all(20),
+                                border_radius=6,
+                            ),
+                            # container,
+                            # include_sports_container,
                         ],
-                        spacing=30
-                    )
+                        spacing=30,
+                    ),
                 ],
-                spacing=10
+                spacing=10,
             )
         )
 
@@ -503,33 +1034,92 @@ class ChannelFilters(ft.UserControl):
         #     container.visible = True
         #     container.update()
 
+    def update_bet_prematch_or_live(self):
+        def on_submit_bet_type(event: ControlEvent):
+            self.filters["type_of_bet_v1"] = type_of_bet_field.value
 
+            type_of_bet_field.border_color = ft.colors.GREEN_900
+            type_of_bet_field.update()
+
+        type_of_bet_field = ft.Dropdown(
+            value=(
+                self.filters.get("type_of_bet_v1")
+                if self.filters.get("type_of_bet_v1")
+                else "All"
+            ),
+            options=[
+                ft.dropdown.Option("All"),
+                ft.dropdown.Option("Prematch"),
+                ft.dropdown.Option("Live"),
+            ],
+            border_color=ft.colors.GREY_700,
+            border_radius=15,
+            border_width=2,
+            on_change=on_submit_bet_type,
+        )
+
+        anchor = ft.Container(
+            ft.Column(
+                [
+                    ft.Container(
+                        ft.Text(
+                            "Prematch | Live",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    ft.Container(
+                        type_of_bet_field,
+                        bgcolor=ft.colors.BLACK26,
+                        padding=ft.padding.all(20),
+                        border_radius=6,
+                    ),
+                ],
+                spacing=10,
+            )
+        )
+        self.row.controls.append(anchor)
 
     def update_all_filters(self):
         self.update_sports_filter()
         self.update_users_filter()
+        self.update_commands_filter()
+        self.update_leagues_filter()
+        self.update_bet_prematch_or_live()
         self.update_type_of_bet_and_count_of_outcomes()
 
         self.flow.controls = [self.row]
-
-
 
     def update_all_filters_in_db(self, event: ControlEvent):
         self.close_filters()
         LoadingAnimation.start(self.page)
 
         with ThreadPoolExecutor() as executor:
-            future1 = executor.submit(api.update_channel_filters, self.channel_id, self.filters)
-            future2 = executor.submit(api.update_sports_filters, self.channel_id, self.sports_filters)
+
+            print(f"self.filters: {self.filters}")
+
+            future1 = executor.submit(
+                api.update_channel_filters, self.channel_id, self.filters
+            )
+            future2 = executor.submit(
+                api.update_sports_filters, self.channel_id, self.sports_filters
+            )
 
             result1 = future1.result()
             result2 = future2.result()
 
-            print(result1, result2)
+            # print(result1, result2)
 
-            if result1['status'] == 'ok' and result2['status'] == 'ok':
+            if result1["status"] == "ok" and result2["status"] == "ok":
                 success_snack_bar = ft.SnackBar(
-                    ft.Text("Filters updated successfully", text_align=ft.TextAlign.CENTER, size=17, weight=ft.FontWeight.W_500),
+                    ft.Text(
+                        "Filters updated successfully",
+                        text_align=ft.TextAlign.CENTER,
+                        size=17,
+                        weight=ft.FontWeight.W_500,
+                    ),
                     behavior=ft.SnackBarBehavior.FLOATING,
                     duration=3000,
                     bgcolor=ft.colors.GREEN_300,
@@ -540,7 +1130,12 @@ class ChannelFilters(ft.UserControl):
 
             else:
                 error_snack_bar = ft.SnackBar(
-                    ft.Text(f"Error: Failed to update filters", text_align=ft.TextAlign.LEFT, size=17, weight=ft.FontWeight.W_500),
+                    ft.Text(
+                        f"Error: Failed to update filters",
+                        text_align=ft.TextAlign.LEFT,
+                        size=17,
+                        weight=ft.FontWeight.W_500,
+                    ),
                     behavior=ft.SnackBarBehavior.FLOATING,
                     duration=3000,
                     bgcolor=ft.colors.RED_300,
@@ -573,9 +1168,14 @@ class ChannelFilters(ft.UserControl):
             # })
             json_data = api.delete_channel(self.channel_id)
 
-            if json_data['status'] == 'ok':
+            if json_data["status"] == "ok":
                 success_snack_bar = ft.SnackBar(
-                    ft.Text(json_data["message"], text_align=ft.TextAlign.CENTER, size=17, weight=ft.FontWeight.W_500),
+                    ft.Text(
+                        json_data["message"],
+                        text_align=ft.TextAlign.CENTER,
+                        size=17,
+                        weight=ft.FontWeight.W_500,
+                    ),
                     behavior=ft.SnackBarBehavior.FLOATING,
                     duration=3000,
                     bgcolor=ft.colors.GREEN_300,
@@ -592,7 +1192,12 @@ class ChannelFilters(ft.UserControl):
 
             else:
                 error_snack_bar = ft.SnackBar(
-                    ft.Text(json_data["message"], text_align=ft.TextAlign.LEFT, size=17, weight=ft.FontWeight.W_500),
+                    ft.Text(
+                        json_data["message"],
+                        text_align=ft.TextAlign.LEFT,
+                        size=17,
+                        weight=ft.FontWeight.W_500,
+                    ),
                     behavior=ft.SnackBarBehavior.FLOATING,
                     duration=3000,
                     bgcolor=ft.colors.RED_300,
@@ -603,8 +1208,6 @@ class ChannelFilters(ft.UserControl):
                 self.page.snack_bar.open = True
 
             LoadingAnimation.stop(self.page)
-
-
 
         def open_dlg(event: ControlEvent):
             self.page.dialog = dlg_delete_channel
@@ -633,7 +1236,11 @@ class ChannelFilters(ft.UserControl):
                         [
                             ft.Container(),
                             ft.Text(
-                                f"Channel: {self.channel_title}", size=25, weight=ft.FontWeight.W_500, color=ft.colors.WHITE, font_family="Exo1",
+                                f"Channel: {self.channel_title}",
+                                size=25,
+                                weight=ft.FontWeight.W_500,
+                                color=ft.colors.WHITE,
+                                font_family="Exo1",
                             ),
                             ft.Container(
                                 ft.IconButton(
@@ -652,9 +1259,8 @@ class ChannelFilters(ft.UserControl):
                     border=ft.border.all(color=ft.colors.CYAN_900, width=2),
                     padding=ft.padding.only(right=15),
                 ),
-
             ],
-            wrap=True
+            wrap=True,
         )
 
         self.container.content = ft.Column(
@@ -663,22 +1269,31 @@ class ChannelFilters(ft.UserControl):
                 self.flow,
                 ft.Container(
                     ft.ElevatedButton(
-                        content=ft.Text("Update", size=20, weight=ft.FontWeight.W_500, font_family="Exo1"),
+                        content=ft.Text(
+                            "Update",
+                            size=20,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
                         color=ft.colors.WHITE,
                         style=ft.ButtonStyle(
                             side={
-                                ft.MaterialState.DEFAULT: ft.BorderSide(3, ft.colors.CYAN_900),
-                                ft.MaterialState.HOVERED: ft.BorderSide(4, ft.colors.CYAN_700),
+                                ft.MaterialState.DEFAULT: ft.BorderSide(
+                                    3, ft.colors.CYAN_900
+                                ),
+                                ft.MaterialState.HOVERED: ft.BorderSide(
+                                    4, ft.colors.CYAN_700
+                                ),
                             },
                             shape=ft.ContinuousRectangleBorder(radius=15),
                         ),
                         height=45,
                         width=200,
-                        on_click=self.update_all_filters_in_db
+                        on_click=self.update_all_filters_in_db,
                     ),
                     padding=ft.padding.all(10),
-                    alignment=ft.alignment.center
-                )
+                    alignment=ft.alignment.center,
+                ),
             ],
             # height=self.page.height
         )
@@ -687,16 +1302,12 @@ class ChannelFilters(ft.UserControl):
         self.container.update()
         LoadingAnimation.stop(self.page)
 
-
-
     def is_activated(self) -> bool:
         return self.container.visible
-
 
     def close_filters(self):
         self.container.visible = False
         self.container.update()
-
 
     def build(self):
         return self.container

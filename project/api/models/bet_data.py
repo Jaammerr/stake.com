@@ -15,6 +15,8 @@ class OutCome(BaseModel):
     live_status: str | None = None
     home: str | None = None
     away: str | None = None
+    bet_type_v1: str | None = None
+    league: str | None = None
 
 
 class ProcessBetData(BaseModel):
@@ -28,5 +30,3 @@ class ProcessBetData(BaseModel):
     total_multiplier: float
     created_at: datetime.datetime | str
     outcomes: list[OutCome]
-
-

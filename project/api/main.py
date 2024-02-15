@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from pyrogram import Client
 from starlette.responses import JSONResponse
 
 from database import *
@@ -13,11 +12,14 @@ app.include_router(channel_router)
 app.include_router(data_router)
 
 
-
 @app.on_event("startup")
 async def on_startup():
-    db.connect()
-    db.create_tables([TelegramChannel, Filter, FilterSports, BetData, OutComes])
+    try:
+        db.connect()
+        db.create_tables([TelegramChannel, Filter, FilterSports, BetData, OutComes])
+        logger.info("DB connected and tables created")
+    except Exception as error:
+        raise Exception(f"Error while connecting to DB: {error}")
 
     try:
         await bot.start()
@@ -25,16 +27,9 @@ async def on_startup():
         raise Exception(f"Error while starting bot: {error}")
 
 
-
-
 @app.exception_handler(Exception)
 async def exception_handler(request, exc):
-    return JSONResponse(
-        {
-            'status': 'error',
-            "message": f"Error: {exc}"
-        }
-    )
+    return JSONResponse({"status": "error", "message": f"Error: {exc}"})
 
 
 # @app.get("/start_bot", status_code=200)
@@ -57,10 +52,7 @@ async def exception_handler(request, exc):
 #         )
 
 
-
-
 # if __name__ == '__main__':
 #     db.connect()
 #     db.create_tables([TelegramChannel, Filter, FilterSports, BetData, OutComes])
 #     uvicorn.run(app, host="0.0.0.0", port=8002)
-

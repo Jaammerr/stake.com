@@ -18,18 +18,18 @@ def get_proxies() -> list[dict]:
     for proxy in proxies:
         try:
             ip, port, username, password = proxy.split(":")
-            valid_proxies.append({
-                "http": f"http://{username}:{password}@{ip}:{port}",
-                "https": f"http://{username}:{password}@{ip}:{port}"
-            })
+            valid_proxies.append(
+                {
+                    "http": f"http://{username}:{password}@{ip}:{port}",
+                    "https": f"http://{username}:{password}@{ip}:{port}",
+                }
+            )
         except ValueError:
             logger.warning(f"Invalid proxy format: {proxy} | Skipped")
-
 
     if not valid_proxies:
         logger.error("No valid proxies found")
         sys.exit(1)
-
 
     logger.success(f"Loaded {len(valid_proxies)} proxies")
     return valid_proxies

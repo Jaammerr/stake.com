@@ -1,5 +1,4 @@
 import flet as ft
-import requests
 from flet_core import ControlEvent
 
 from .channel_filters import ChannelFilters
@@ -14,9 +13,10 @@ class ListChannels(ft.UserControl):
         self.channel_titles = {}
 
         self.flow = ft.ResponsiveRow()
-        self.container = ft.Container(bgcolor=ft.colors.BLACK38, border_radius=10, padding=ft.padding.all(20))
+        self.container = ft.Container(
+            bgcolor=ft.colors.BLACK38, border_radius=10, padding=ft.padding.all(20)
+        )
         self.selected_channel = None
-
 
     def update_channels(self):
         # response = requests.get('http://api:8000/data/channels')
@@ -29,24 +29,42 @@ class ListChannels(ft.UserControl):
             }
             event.control.update()
 
-        if json_data['status'] == 'ok':
+        if json_data["status"] == "ok":
             channels = []
 
-            for channel in json_data['result']:
-                title = f"{channel['channel_title'][:25]}.." if len(channel["channel_title"]) > 25 else channel["channel_title"]
+            for channel in json_data["result"]:
+                title = (
+                    f"{channel['channel_title'][:25]}.."
+                    if len(channel["channel_title"]) > 25
+                    else channel["channel_title"]
+                )
                 channels.append(
                     ft.Container(
-                        ft.TextButton(on_click=self.on_click, style=ft.ButtonStyle(
-                            side={
-                                ft.MaterialState.DEFAULT: ft.BorderSide(6, ft.colors.CYAN_900),
-                                ft.MaterialState.HOVERED: ft.BorderSide(6, ft.colors.CYAN_700),
-                            },
-                            shape=ft.ContinuousRectangleBorder(radius=140),
-                        ), height=45, content=ft.Text(title, size=20, weight=ft.FontWeight.W_600, color=ft.colors.GREY, max_lines=1)),
+                        ft.TextButton(
+                            on_click=self.on_click,
+                            style=ft.ButtonStyle(
+                                side={
+                                    ft.MaterialState.DEFAULT: ft.BorderSide(
+                                        6, ft.colors.CYAN_900
+                                    ),
+                                    ft.MaterialState.HOVERED: ft.BorderSide(
+                                        6, ft.colors.CYAN_700
+                                    ),
+                                },
+                                shape=ft.ContinuousRectangleBorder(radius=140),
+                            ),
+                            height=45,
+                            content=ft.Text(
+                                title,
+                                size=20,
+                                weight=ft.FontWeight.W_600,
+                                color=ft.colors.GREY,
+                                max_lines=1,
+                            ),
+                        ),
                         border_radius=4,
                         col={"sm": 6, "md": 4, "xl": 2},
                     )
-
                 )
 
                 self.page.client_storage.set(title, channel["channel_id"])
@@ -64,10 +82,17 @@ class ListChannels(ft.UserControl):
             self.flow.controls = channels
             self.container.content = ft.Column(
                 [
-                    ft.Container(ft.Text("Active Channels", size=25, weight=ft.FontWeight.W_500, font_family="Exo1"), alignment=ft.alignment.top_left),
-                    self.flow
+                    ft.Container(
+                        ft.Text(
+                            "Active Channels",
+                            size=25,
+                            weight=ft.FontWeight.W_500,
+                            font_family="Exo1",
+                        ),
+                        alignment=ft.alignment.top_left,
+                    ),
+                    self.flow,
                 ],
-
             )
 
             # check if flow is bind to page
@@ -75,7 +100,6 @@ class ListChannels(ft.UserControl):
                 self.flow.update()
                 self.container.update()
                 self.page.update()
-
 
     def close_last_channel(self):
         last_channel_id = self.page.client_storage.get("last_channel_id")
@@ -94,7 +118,6 @@ class ListChannels(ft.UserControl):
                 self.flow.update()
                 self.container.update()
                 self.page.update()
-
 
     def on_click(self, event: ControlEvent):
         if not event.control.page:
@@ -141,14 +164,13 @@ class ListChannels(ft.UserControl):
 
             self.flow.disabled = True
             self.flow.update()
-            self.filters.open_filters(channel_id, event.control, self.channel_titles.get(channel_id))
+            self.filters.open_filters(
+                channel_id, event.control, self.channel_titles.get(channel_id)
+            )
             self.flow.disabled = False
             self.flow.update()
 
             self.selected_channel = event.control
-
-
-
 
     def build(self):
         return self.container

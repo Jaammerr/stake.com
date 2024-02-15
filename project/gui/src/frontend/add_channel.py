@@ -13,7 +13,9 @@ class AddChannel(ft.UserControl):
         self.channels = channels
 
         self.text = "Add channel"
-        self.input_channel_field = ft.TextField(border_radius=4, on_change=self.on_change_input)
+        self.input_channel_field = ft.TextField(
+            border_radius=4, on_change=self.on_change_input
+        )
         self.dialog = ft.AlertDialog(
             modal=True,
             title=ft.Text("Channel creation"),
@@ -23,19 +25,29 @@ class AddChannel(ft.UserControl):
                 ft.Container(
                     ft.Row(
                         [
-                            ft.ElevatedButton(text="Cancel", color=ft.colors.RED_50, on_click=self.on_close, height=40, width=150),
-                            ft.ElevatedButton(text="Submit", color=ft.colors.PRIMARY, on_click=self.on_submit, height=40, width=150),
+                            ft.ElevatedButton(
+                                text="Cancel",
+                                color=ft.colors.RED_50,
+                                on_click=self.on_close,
+                                height=40,
+                                width=150,
+                            ),
+                            ft.ElevatedButton(
+                                text="Submit",
+                                color=ft.colors.PRIMARY,
+                                on_click=self.on_submit,
+                                height=40,
+                                width=150,
+                            ),
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-
                     ),
                     padding=ft.padding.all(10),
-                )
+                ),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
             # content_padding=ft.padding.all(20),
         )
-
 
     def on_close(self, event: ControlEvent):
         self.dialog.open = False
@@ -51,19 +63,16 @@ class AddChannel(ft.UserControl):
 
         self.page.update()
 
-
     def on_click(self, event: ControlEvent):
         self.page.dialog = self.dialog
         self.dialog.open = True
         self.page.update()
-
 
     def on_submit(self, event: ControlEvent):
         if not self.input_channel_field.value.replace("-", "").isdigit():
             self.input_channel_field.error_text = "Channel ID must be a number"
             self.page.update()
             return
-
 
         LoadingAnimation.start(self.page)
         self.page.dialog.open = False
@@ -74,9 +83,14 @@ class AddChannel(ft.UserControl):
         # })
         json_data = api.verify_channel(int(self.input_channel_field.value))
 
-        if json_data['status'] == 'ok':
+        if json_data["status"] == "ok":
             success_snack_bar = ft.SnackBar(
-                ft.Text(json_data["message"], text_align=ft.TextAlign.CENTER, size=17, weight=ft.FontWeight.W_500),
+                ft.Text(
+                    json_data["message"],
+                    text_align=ft.TextAlign.CENTER,
+                    size=17,
+                    weight=ft.FontWeight.W_500,
+                ),
                 behavior=ft.SnackBarBehavior.FLOATING,
                 duration=3000,
                 bgcolor=ft.colors.GREEN_300,
@@ -90,7 +104,12 @@ class AddChannel(ft.UserControl):
 
         else:
             error_snack_bar = ft.SnackBar(
-                ft.Text(json_data['message'], text_align=ft.TextAlign.LEFT, size=17, weight=ft.FontWeight.W_500),
+                ft.Text(
+                    json_data["message"],
+                    text_align=ft.TextAlign.LEFT,
+                    size=17,
+                    weight=ft.FontWeight.W_500,
+                ),
                 behavior=ft.SnackBarBehavior.FLOATING,
                 duration=3000,
                 bgcolor=ft.colors.RED_300,

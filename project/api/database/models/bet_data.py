@@ -7,7 +7,7 @@ from loguru import logger
 
 
 class BetData(Model):
-    bet_type = CharField(max_length=8)
+    bet_type = CharField(max_length=30)
     bet_id = CharField(max_length=20, primary_key=True)
     url = CharField(max_length=100)
     user = CharField(max_length=40, null=True)
@@ -20,19 +20,18 @@ class BetData(Model):
     class Meta:
         database = db
 
-
     @classmethod
     def add_new_bet(
-            cls,
-            bet_type: str,
-            bet_id: str,
-            url: str | None,
-            user: str,
-            amount: float,
-            currency: str,
-            total_multiplier: float,
-            created_at: datetime.datetime,
-            amount_usd: float | None = None
+        cls,
+        bet_type: str,
+        bet_id: str,
+        url: str | None,
+        user: str,
+        amount: float,
+        currency: str,
+        total_multiplier: float,
+        created_at: datetime.datetime,
+        amount_usd: float | None = None,
     ):
         try:
             if cls.is_exists(bet_id):
@@ -48,7 +47,7 @@ class BetData(Model):
                 amount_usd=amount_usd,
                 currency=currency,
                 total_multiplier=total_multiplier,
-                created_at=created_at
+                created_at=created_at,
             )
 
             logger.debug(f"Added new bet to db: {bet_id}")
@@ -68,23 +67,33 @@ class BetData(Model):
                     amount_usd=amount_usd,
                     currency=currency,
                     total_multiplier=total_multiplier,
-                    created_at=created_at
+                    created_at=created_at,
                 )
             except Exception as error:
                 logger.error(f"Error while reconnecting to db: {error}")
 
+        except Exception as error:
+            logger.error(f"Error while creating bet data: {error}")
+
+    @classmethod
+    def is_exists(cls, bet_id: str) -> bool:
+        try:
+            return cls.select().where(cls.bet_id == bet_id).exists()
+        except InterfaceError:
+            logger.warning("InterfaceError while creating bet data, reconnecting to db")
+            try:
+                db.connect(reuse_if_open=True)
+                logger.warning("Reconnected to db")
+                return cls.is_exists(bet_id)
+            except Exception as error:
+                logger.error(f"Error while reconnecting to db: {error}")
 
         except Exception as error:
             logger.error(f"Error while creating bet data: {error}")
 
 
-    @classmethod
-    def is_exists(cls, bet_id: str) -> bool:
-        return cls.select().where(cls.bet_id == bet_id).exists()
-
-
 class OutComes(Model):
-    bet = ForeignKeyField(BetData, backref='outcomes', column_name='bet_id')
+    bet = ForeignKeyField(BetData, backref="outcomes", column_name="bet_id")
     outcome_id = CharField(max_length=50)
     sport = CharField(max_length=20)
     market = CharField(max_length=200)
@@ -94,28 +103,32 @@ class OutComes(Model):
     is_live = BooleanField()
     live_score = CharField(max_length=10, null=True)
     live_status = CharField(max_length=200, null=True)
+    league = CharField(max_length=200, null=True)
+    bet_type_v1 = CharField(max_length=20, null=True)  # Live or Prematch
     home = CharField(max_length=200)
     away = CharField(max_length=200)
 
     class Meta:
         database = db
-        primary_key = CompositeKey('bet', 'outcome_id')
+        primary_key = CompositeKey("bet", "outcome_id")
 
     @classmethod
     def add_new_outcome(
-            cls,
-            bet: Any,
-            outcome_id: str,
-            sport: str,
-            market: str,
-            odds: float,
-            outcome_name: str,
-            start_time: datetime.datetime,
-            is_live: bool,
-            live_score: str | None,
-            live_status: str | None,
-            home: str,
-            away: str,
+        cls,
+        bet: Any,
+        outcome_id: str,
+        sport: str,
+        market: str,
+        odds: float,
+        outcome_name: str,
+        start_time: datetime.datetime,
+        is_live: bool,
+        live_score: str | None,
+        live_status: str | None,
+        league: str | None,
+        bet_type_v1: str | None,
+        home: str,
+        away: str,
     ):
         try:
             return cls.create(
@@ -129,18 +142,43 @@ class OutComes(Model):
                 is_live=is_live,
                 live_score=live_score,
                 live_status=live_status,
+                league=league,
+                bet_type_v1=bet_type_v1,
                 home=home,
-                away=away
+                away=away,
             )
 
         except IntegrityError:
-            logger.warning(f"Outcome ID {outcome_id} already exists for bet {bet.bet_id}")
-            return False
+            logger.warning(
+                f"Outcome ID {outcome_id} already exists for bet {bet.bet_id}"
+            )
+
+        except InterfaceError:
+            logger.warning("InterfaceError while creating bet data, reconnecting to db")
+            try:
+                db.connect(reuse_if_open=True)
+                logger.warning("Reconnected to db")
+                return cls.add_new_outcome(
+                    bet=bet,
+                    outcome_id=outcome_id,
+                    sport=sport,
+                    market=market,
+                    odds=odds,
+                    outcome_name=outcome_name,
+                    start_time=start_time,
+                    is_live=is_live,
+                    live_score=live_score,
+                    live_status=live_status,
+                    league=league,
+                    bet_type_v1=bet_type_v1,
+                    home=home,
+                    away=away,
+                )
+            except Exception as error:
+                logger.error(f"Error while reconnecting to db: {error}")
 
         except Exception as error:
             logger.error(f"Error while creating outcomes data: {error}")
-
-
 
     @classmethod
     def is_exists(cls, outcome_id: str) -> bool:
