@@ -41,10 +41,10 @@ class Scraper:
             "x-language": "en",
         }
 
-        session.proxies = {
-            "http": f"http://{config['proxy']}",
-            "https": f"http://{config['proxy']}",
-        }
+        # session.proxies = {
+        #     "http": f"http://{config['proxy']}",
+        #     "https": f"http://{config['proxy']}",
+        # }
         session.timeout = 5
         self.session = session
 
@@ -151,7 +151,7 @@ class Scraper:
                                 == "Not started"
                                 else outcome["fixture"]["eventStatus"]["matchStatus"]
                             ),
-                            "league": outcome["fixture"]["tournament"]["name"],
+                            "league": f'{outcome["fixture"]["tournament"]["category"]["name"]} {outcome["fixture"]["tournament"]["name"]}',
                             "home": outcome["fixture"]["data"]["competitors"][0][
                                 "name"
                             ],

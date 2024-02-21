@@ -113,7 +113,7 @@ if __name__ == "__main__":
             view=ft.WEB_BROWSER,
             assets_dir="assets",
             port=8080,
-            host="0.0.0.0",
+            # host="0.0.0.0",
         )
     except Exception as error:
         raise Exception(f"Error while starting app: {error}")

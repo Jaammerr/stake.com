@@ -10,8 +10,34 @@ from bot import bot
 
 
 def create_message_and_send(channel_id: int, data: ProcessBetData):
-    messages = (
-        (
+    # messages = (
+    #     (
+    #         f"🆕   <b><strong>Одиночна ставка ➖ 🆔 <b><a href={data.url}>{data.bet_id.split(':')[1]}</a><strong></b>:"
+    #         f"\n\n📃   <b>Загальний коеф. = {round(data.total_multiplier, 2)}</b>"
+    #         f"\n💵   <b>Оригінальна сума = {round(data.amount, 3)} {data.currency.upper()}</b>"
+    #         f"\n💸   <b>Сума в USD = {round(data.amount_usd, 1)} $</b>"
+    #         f"\n\n{'🔥   <u>Live</u>' if data.outcomes[0].is_live else ''}"
+    #         f"\n🏆   <b><strong>Ліга = {f'{data.outcomes[0].league}'}</b>"
+    #         f"\n\n🖥   {f'<i>{data.outcomes[0].home} - {data.outcomes[0].away}</i>'}"
+    #         f"\n🔮   <b><strong>Спорт = {f'{data.outcomes[0].sport}'}"
+    #         f"\n🪧   Ринок = {f'{data.outcomes[0].market}'}"
+    #         f"\n📎   Вибір = {f'{data.outcomes[0].outcome_name}'}"
+    #         f"\n🫲   Коеф. = {f'{round(data.outcomes[0].odds, 2)}'}<strong></b>"
+    #         f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[0].live_score}</u>' if data.outcomes[0].is_live else ''}"
+    #         f"\n{f'<u>  📆 Час початку = {data.outcomes[0].start_time}</u>' if not data.outcomes[0].is_live else ''}"
+    #     )
+    #     if data.bet_type == "Single"
+    #     else (
+    #         f"🆕   <b><strong>Експрес ставка ➖ 🆔 <b><a href={data.url}>{data.bet_id.split(':')[1]}</a><strong></b>:"
+    #         f"\n\n📃   <b>Загальний коеф. = {round(data.total_multiplier, 2)}</b>"
+    #         f"\n💵   <b>Оригінальна сума = {round(data.amount, 3)} {data.currency.upper()}</b>"
+    #         f"\n💸   <b>Сума в USD = {round(data.amount_usd, 1)} $</b>"
+    #         f"\n\n📖  <b>Кількість подій = {len(data.outcomes)}</b>"
+    #     )
+    # )
+
+    if data.bet_type == "Single":
+        messages = (
             f"🆕   <b><strong>Одиночна ставка ➖ 🆔 <b><a href={data.url}>{data.bet_id.split(':')[1]}</a><strong></b>:"
             f"\n\n📃   <b>Загальний коеф. = {round(data.total_multiplier, 2)}</b>"
             f"\n💵   <b>Оригінальна сума = {round(data.amount, 3)} {data.currency.upper()}</b>"
@@ -26,15 +52,93 @@ def create_message_and_send(channel_id: int, data: ProcessBetData):
             f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[0].live_score}</u>' if data.outcomes[0].is_live else ''}"
             f"\n{f'<u>  📆 Час початку = {data.outcomes[0].start_time}</u>' if not data.outcomes[0].is_live else ''}"
         )
-        if data.bet_type == "Single"
-        else (
+
+    elif len(data.outcomes) == 2:
+        messages = (
+            f"🆕   <b><strong>Експрес ставка ➖ 🆔 <b><a href = {data.url}>{data.bet_id.split(':')[1]}</a><strong></b>:"
+            
+            f"\n\n📖  <b>Кількість подій = {len(data.outcomes)}</b>"
+            f"\n\n📃   <b>Загальний коеф. = {round(data.total_multiplier, 2)}</b>"
+            f"\n💵   <b>Оригінальна сума = {round(data.amount, 3)} {data.currency.upper()}</b>"
+            f"\n💸   <b>Сума в USD = {round(data.amount_usd, 1)} $</b>"
+            
+            "\n\n1 ➖➖➖➖"
+            
+            f"\n\n{'🔥   <u>Live</u>' if data.outcomes[0].is_live else ''}"
+            f"\n🏆   <b><strong>Ліга = {f'{data.outcomes[0].league}'}</b>"
+            f"\n\n🖥   {f'<i>{data.outcomes[0].home} - {data.outcomes[0].away}</i>'}"
+            f"\n🔮   <b><strong>Спорт = {f'{data.outcomes[0].sport}'}"
+            f"\n🪧   Ринок = {f'{data.outcomes[0].market}'}"
+            f"\n📎   Вибір = {f'{data.outcomes[0].outcome_name}'}"
+            f"\n🫲   Коеф. = {f'{round(data.outcomes[0].odds, 2)}'}<strong></b>"
+            f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[0].live_score}</u>' if data.outcomes[0].is_live else ''}"
+            f"\n{f'<u>  📆 Час початку = {data.outcomes[0].start_time}</u>' if not data.outcomes[0].is_live else ''}"
+            
+            "\n\n2 ➖➖➖➖"
+            
+            f"\n\n{'🔥   <u>Live</u>' if data.outcomes[1].is_live else ''}"
+            f"\n🏆   <b><strong>Ліга = {f'{data.outcomes[1].league}'}</b>"
+            f"\n\n🖥   {f'<i>{data.outcomes[1].home} - {data.outcomes[1].away}</i>'}"
+            f"\n🔮   <b><strong>Спорт = {f'{data.outcomes[1].sport}'}"
+            f"\n🪧   Ринок = {f'{data.outcomes[1].market}'}"
+            f"\n📎   Вибір = {f'{data.outcomes[1].outcome_name}'}"
+            f"\n🫲   Коеф. = {f'{round(data.outcomes[1].odds, 2)}'}<strong></b>"
+            f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[1].live_score}</u>' if data.outcomes[1].is_live else ''}" 
+            f"\n{f'<u>  📆 Час початку = {data.outcomes[1].start_time}</u>' if not data.outcomes[1].is_live else ''}"
+        )
+
+    elif len(data.outcomes) == 3:
+        messages = (
+            f"🆕   <b><strong>Експрес ставка ➖ 🆔 <b><a href = {data.url}>{data.bet_id.split(':')[1]}</a><strong></b>:"
+            
+            f"\n\n📖  <b>Кількість подій = {len(data.outcomes)}</b>"
+            f"\n📃   <b>Загальний коеф. = {round(data.total_multiplier, 2)}</b>"
+            f"\n💵   <b>Оригінальна сума = {round(data.amount, 3)} {data.currency.upper()}</b>"
+            f"\n💸   <b>Сума в USD = {round(data.amount_usd, 1)} $</b>"
+            
+            "\n\n1 ➖➖➖➖"
+            
+            f"\n\n{'🔥   <u>Live</u>' if data.outcomes[0].is_live else ''}"
+            f"\n🏆   <b><strong>Ліга = {f'{data.outcomes[0].league}'}</b>"
+            f"\n\n🖥   {f'<i>{data.outcomes[0].home} - {data.outcomes[0].away}</i>'}"
+            f"\n🔮   <b><strong>Спорт = {f'{data.outcomes[0].sport}'}"
+            f"\n🪧   Ринок = {f'{data.outcomes[0].market}'}"
+            f"\n📎   Вибір = {f'{data.outcomes[0].outcome_name}'}"
+            f"\n🫲   Коеф. = {f'{round(data.outcomes[0].odds, 2)}'}<strong></b>"
+            f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[0].live_score}</u>' if data.outcomes[0].is_live else ''}"
+            
+            "\n\n2 ➖➖➖➖"
+            
+            f"\n\n{'🔥   <u>Live</u>' if data.outcomes[1].is_live else ''}"
+            f"\n🏆   <b><strong>Ліга = {f'{data.outcomes[1].league}'}</b>"
+            f"\n\n🖥   {f'<i>{data.outcomes[1].home} - {data.outcomes[1].away}</i>'}"
+            f"\n🔮   <b><strong>Спорт = {f'{data.outcomes[1].sport}'}"
+            f"\n🪧   Ринок = {f'{data.outcomes[1].market}'}"
+            f"\n📎   Вибір = {f'{data.outcomes[1].outcome_name}'}"
+            f"\n🫲   Коеф. = {f'{round(data.outcomes[1].odds, 2)}'}<strong></b>"
+            f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[1].live_score}</u>' if data.outcomes[1].is_live else ''}"
+            
+            "\n\n3 ➖➖➖➖"
+            
+            f"\n\n{'🔥   <u>Live</u>' if data.outcomes[2].is_live else ''}"
+            f"\n🏆   <b><strong>Ліга = {f'{data.outcomes[2].league}'}</b>"
+            f"\n\n🖥   {f'<i>{data.outcomes[2].home} - {data.outcomes[2].away}</i>'}"
+            f"\n🔮   <b><strong>Спорт = {f'{data.outcomes[2].sport}'}"
+            f"\n🪧   Ринок = {f'{data.outcomes[2].market}'}"
+            f"\n📎   Вибір = {f'{data.outcomes[2].outcome_name}'}"
+            f"\n🫲   Коеф. = {f'{round(data.outcomes[2].odds, 2)}'}<strong></b>"
+            f"\n\n{f'<u>  🧾 Актуальний рахунок = {data.outcomes[2].live_score}</u>' if data.outcomes[2].is_live else ''}"
+        )
+
+    else:
+        messages = (
             f"🆕   <b><strong>Експрес ставка ➖ 🆔 <b><a href={data.url}>{data.bet_id.split(':')[1]}</a><strong></b>:"
             f"\n\n📃   <b>Загальний коеф. = {round(data.total_multiplier, 2)}</b>"
             f"\n💵   <b>Оригінальна сума = {round(data.amount, 3)} {data.currency.upper()}</b>"
             f"\n💸   <b>Сума в USD = {round(data.amount_usd, 1)} $</b>"
             f"\n\n📖  <b>Кількість подій = {len(data.outcomes)}</b>"
         )
-    )
+
 
     # if data.bet_type == "Single":
     #     messages = f"""

@@ -4,7 +4,6 @@ from database import BetData, OutComes, Filter, FilterSports
 from utils import create_message_and_send
 from configuration import config
 
-
 celery = Celery()
 celery.conf.broker_url = config["redis_broker_url"]
 celery.conf.result_backend = config["redis_backend_url"]
@@ -12,16 +11,16 @@ celery.conf.result_backend = config["redis_backend_url"]
 
 @celery.task(time_limit=20)
 def process_bet_data(data: dict):
-    print(
-        f"""
-    Processing bet data:
-    {data}
-    """
-    )
-
     data = ProcessBetData(**data)
     if BetData.is_exists(data.bet_id):
         return
+
+    print(
+        f"""
+        Processing bet data:
+        {data}
+        """
+    )
 
     bet_data_instance = BetData.add_new_bet(
         bet_type=data.bet_type,
@@ -61,6 +60,7 @@ def process_bet_data(data: dict):
 
 def validate_outcomes(channel_filter: dict, data: ProcessBetData):
     sports_filters = FilterSports.get_sports_filters(channel_filter["channel_id"])
+    print(f"Sports filters for bet {data.bet_id}")
     valid_commands = channel_filter["valid_commands"].get("values", [])
     valid_leagues = channel_filter["valid_leagues"].get("values", [])
     invalid_commands = channel_filter["invalid_commands"].get("values", [])
@@ -74,6 +74,7 @@ def validate_outcomes(channel_filter: dict, data: ProcessBetData):
     #     return
 
     if "All" not in types_of_bet and data.bet_type not in types_of_bet:
+        print(f"return because of type_of_bet: {data.bet_id}")
         return
 
     # type_of_bet_v1 (All, Live, Prematch)
@@ -82,53 +83,61 @@ def validate_outcomes(channel_filter: dict, data: ProcessBetData):
                 outcome.bet_type_v1 == channel_filter["type_of_bet_v1"]
                 for outcome in data.outcomes
         ):
+            print(f"return because of type_of_bet_v1 {data.bet_id}")
             return
 
-    if not (sports_filters and valid_commands and valid_leagues and invalid_commands and invalid_leagues):
-        return channel_filter["channel_id"]
+    # if not all(sports_filters and valid_commands and valid_leagues and invalid_commands and invalid_leagues):
+    #     print(f"return because of no sports filters1")
+    #     return channel_filter["channel_id"]
 
     bet_commands = [
         command for outcome in data.outcomes for command in [outcome.home, outcome.away]
     ]
     bet_leagues = [outcome.league for outcome in data.outcomes]
 
-    if valid_commands:
+    if valid_commands and "All" not in valid_commands:
         if channel_filter["include_commands"]:
             if not all(command in valid_commands for command in bet_commands):
+                print(f"return because of valid commands {data.bet_id}")
                 return
 
         else:
             if not any(command in valid_commands for command in bet_commands):
+                print(f"return because of valid1 commands {data.bet_id}")
                 return
 
-    if valid_leagues:
+    if valid_leagues and "All" not in valid_leagues:
         if channel_filter["include_leagues"]:
             if not all(league in valid_leagues for league in bet_leagues):
+                print(f"return because of valid leagues {data.bet_id}")
                 return
 
         else:
             if not any(league in valid_leagues for league in bet_leagues):
+                print(f"return because of valid1 leagues {data.bet_id}")
                 return
 
-    if invalid_commands:
+    if invalid_commands and "All" not in invalid_commands:
         if any(
                 any(command in invalid_commands for command in [outcome.home, outcome.away])
                 for outcome in data.outcomes
         ):
-            print(f"return because of invalid commands")
+            print(f"return because of invalid commands {data.bet_id}")
             return
 
-    if invalid_leagues:
+    if invalid_leagues and "All" not in invalid_leagues:
         if any(
                 any(league in invalid_leagues for league in [outcome.league])
                 for outcome in data.outcomes
         ):
-            print(f"return because of invalid leagues")
+            print(f"return because of invalid leagues {data.bet_id}")
             return
 
     if not sports_filters:
+        print(f"return because of no sports filters {data.bet_id}")
         return channel_filter["channel_id"]
 
+    print(f"filtering sports filters for bet {data.bet_id}")
     # if channel_filter["type_of_bet"] == "Multiple":
     if any(type_of_bet.startswith("Multiple") for type_of_bet in types_of_bet):
         for sport_filter in sports_filters:
@@ -209,6 +218,8 @@ def validate_outcomes(channel_filter: dict, data: ProcessBetData):
                             <= sport_filter["max_amount"]
                     ):
                         return channel_filter["channel_id"]
+
+
 
 
 def get_channels_with_correct_filters(data: ProcessBetData):
