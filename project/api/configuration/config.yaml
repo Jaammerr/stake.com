@@ -1,5 +1,5 @@
-tg_api_id: 17429549
-tg_api_hash: ebec90693311b8385a711785751d2e81
-tg_bot_token: 6195999019:AAHYZ8woCKxK-H1KU3ZklIOyzIZgvnFd4IM
+tg_api_id: 
+tg_api_hash: 
+tg_bot_token:
 redis_broker_url: redis://localhost:6379
 redis_backend_url: redis://localhost:6379
