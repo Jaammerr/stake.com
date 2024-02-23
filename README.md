@@ -14,6 +14,8 @@ This project is designed to collect all user bets on the site [stake.com](https:
 
 ## Install 
 
+-- Don't forget to set up config files in api and scraper folders (configuration/config.yaml)
+
 Install [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
 
 Then, clone this repository and run:
