@@ -1,5 +1,5 @@
 ## Information
-This project is designed to collect all user bets on the site [stake.com](https://stake.com) and analyze them. Using the GUI, you can set various filters and add telegram channels to receive information about bets. All data is saved to a database.
+This project is designed to collect all user bets on the site [stake.com](https://stake.com) and analyze them. Using the WEB GUI, you can set various filters and add telegram channels to receive information about bets. All data is saved to a database.
 
 # Screenshots
 
