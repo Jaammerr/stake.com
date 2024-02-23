@@ -34,7 +34,7 @@ services:
       - 8080:8080
     volumes:
       - .:/app
-    # command: ["wait-for-it.sh", "api:8004", "--", "your-existing-command"]
+    # command: ["wait-for-it.sh", "api:8004"]
 #    healthcheck:
 #      test: [ "CMD", "curl", "-f", "http://api:8004" ]
 #      interval: 1m30s
